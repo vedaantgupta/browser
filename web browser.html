@@ -5,56 +5,62 @@
   <title>Mini Browser App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
+:root {
   --bg: #ffffff;
-  --fg: #000000;
+  --fg: #1a1a1a;
   --accent: #007bff;
   --accent-hover: #0056b3;
   --header-bg: #222;
   --nav-bg: #333;
   --tab-bg: #444;
-  --card-bg: #fff;
-  --shadow: 0 2px 8px rgba(0,0,0,0.1);
-  --radius: 8px;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  --radius: 10px;
 }
+
 [data-theme="dark"] {
-  --bg: #0b103a;
-  --fg: #e0e0e0;
+  --bg: #0d1117;
+  --fg: #e6edf3;
   --accent: #3399ff;
   --accent-hover: #2277cc;
-  --header-bg: #1c1c1c;
-  --nav-bg: #2a2a2a;
-  --tab-bg: #3a3a3a;
+  --header-bg: #161b22;
+  --nav-bg: #21262d;
+  --tab-bg: #30363d;
   --card-bg: #1e1e1e;
-  --shadow: 0 2px 6px rgba(255,255,255,0.05);
+  --shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--fg);
+  line-height: 1.6;
 }
 
-header, .tools {
+header,
+.tools {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 20px;
   background: var(--header-bg);
   color: white;
+  justify-content: flex-start;
 }
 
-input[type="text"], select {
+input[type="text"],
+select {
   flex: 1;
-  min-width: 200px;
-  padding: 10px;
+  min-width: 220px;
+  padding: 10px 14px;
   font-size: 16px;
   border-radius: var(--radius);
   border: none;
-  background: #f9f9f9;
+  background: #f1f1f1;
   color: var(--fg);
+  outline: none;
 }
 
 button {
@@ -65,25 +71,39 @@ button {
   color: white;
   cursor: pointer;
   font-weight: 500;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
 }
 
 button:hover {
   background: var(--accent-hover);
 }
 
+.cta-button {
+  background-color: var(--accent);
+  color: white;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: var(--accent-hover);
+}
+
 nav {
   background: var(--nav-bg);
   display: flex;
-  gap: 6px;
-  padding: 10px 16px;
+  gap: 8px;
+  padding: 10px 20px;
   overflow-x: auto;
 }
 
 nav button.tab {
   background: var(--tab-bg);
   color: white;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: var(--radius);
   white-space: nowrap;
 }
@@ -97,52 +117,6 @@ iframe {
   height: calc(100vh - 200px);
   border: none;
   background: var(--card-bg);
-}
-
-#output {
-  padding: 20px;
-}
-
-.section {
-  background: var(--card-bg);
-  padding: 20px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-}
-
-.result a {
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.result a:hover {
-  text-decoration: underline;
-}
-
-.result p {
-  font-size: 14px;
-  margin: 5px 0 15px;
-  color: var(--fg);
-}
-
-.cta-button {
-  background-color: #007BFF;
-  color: white;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.cta-button:hover {
-  background-color: #0056b3;
 }
 
 #progressBar {
@@ -163,50 +137,89 @@ aside#historyBox ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  text-align: left;
 }
 
-/* ✅ Smart Image Gallery - Clean & Responsive */
+.section {
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 20px;
+  max-width: 100%;
+  text-align: left;
+}
+
+.section h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: var(--fg);
+}
+
+.result a {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.result a:hover {
+  text-decoration: underline;
+}
+
+.result p {
+  font-size: 14px;
+  margin: 6px 0 14px;
+  color: var(--fg);
+}
+
+/* Gallery Container */
 #gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  justify-content: flex-start;
   margin-top: 20px;
 }
 
+/* Each Image Card */
 #gallery div {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 10px;
+  max-width: 300px;
+  width: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 300px; /* Ideal card height */
-  position: relative;
+  transition: transform 0.2s ease;
 }
 
+#gallery div:hover {
+  transform: translateY(-4px);
+}
+
+/* Image inside card */
 #gallery img {
-  max-height: 100%;
   max-width: 100%;
+  max-height: 250px;
   width: auto;
   height: auto;
   object-fit: contain;
-  border-radius: var(--radius);
-  transition: transform 0.3s ease;
+  display: block;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-#gallery img:hover {
-  transform: scale(1.05);
-}
-
-/* ✅ Image Modal */
+/* Image Modal */
 .modal {
   position: fixed;
   top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
   display: none;
   justify-content: center;
   align-items: center;
@@ -215,17 +228,33 @@ aside#historyBox ul {
 }
 
 .modal img {
-  max-height: 90vh;
   max-width: 90vw;
+  max-height: 85vh;
   object-fit: contain;
-  transition: transform 0.3s ease;
   border-radius: var(--radius);
+  transition: transform 0.3s ease;
 }
 
 .zoom-controls {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
-  gap: 10px;
+  gap: 12px;
+}
+
+.zoom-controls button {
+  padding: 10px 16px;
+  background: #ffffff;
+  color: #333;
+  border-radius: 6px;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.zoom-controls button:hover {
+  background: #f0f0f0;
 }
 
   </style>
@@ -276,18 +305,17 @@ aside#historyBox ul {
 
 <!-- Wikipedia Results Area -->
 <div id="wikiSection">
-  <div id="listenControls" style="display: none; margin-bottom: 10px;">
-    <select id="languageSelect">
-      <option value="en-US">English (US)</option>
-      <option value="hi-IN">English (India)</option>
-      <option value="fr-FR">English (French)</option>
-      <option value="de-DE">English (German)</option>
-    </select>
+ <div id="listenControls" style="display: none; margin-bottom: 15px; padding: 10px; background: #f0f0f0; border-radius: 10px;">
+  <label for="languageSelect"><strong>Voice Language:</strong></label>
+  <select id="languageSelect" style="margin: 0 10px;"></select>
+  <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
     <button onclick="speakWikipediaSummary()">🔊 Listen</button>
-      <button onclick="pauseSpeaking()">⏸ Pause</button>
-  <button onclick="resumeSpeaking()">▶️ Resume</button>
-  <button onclick="stopSpeaking()">⏹ Stop</button>
+    <button onclick="pauseSpeaking()">⏸ Pause</button>
+    <button onclick="resumeSpeaking()">▶️ Resume</button>
+    <button onclick="stopSpeaking()">⏹ Stop</button>
   </div>
+</div>
+
 
   <div id="wikiContent">
     <!-- Wikipedia summary gets injected here -->
@@ -295,7 +323,8 @@ aside#historyBox ul {
 </div>
 
     </section>
-    <section id="images" class="section">
+    
+        <section id="images" class="section">
       <h2>📸 Images</h2>
 
 <div id="gallery" class="gallery"></div>
@@ -308,6 +337,7 @@ aside#historyBox ul {
   </div>
 </div>
     </section>
+    
     <section id="results" class="section"></section>
   </main>
 
@@ -320,11 +350,6 @@ aside#historyBox ul {
   </aside>
 
 <script>
-// Final Working JS for Mini Browser App with All Features
-
-// Final Working JS for Mini Browser App with All Features
-
-// Global variables
 const viewer = document.getElementById("viewer");
 const urlInput = document.getElementById("urlInput");
 const searchBox = document.getElementById("searchBox");
@@ -390,15 +415,6 @@ function navigate() {
   }
 }
 
-function updateHistory(url) {
-  if (currentIndex < historyStack.length - 1) {
-    historyStack.splice(currentIndex + 1);
-  }
-  historyStack.push(url);
-  currentIndex = historyStack.length - 1;
-  saveToLocalHistory(url);
-}
-
 function goBack() {
   if (currentIndex > 0) {
     currentIndex--;
@@ -413,56 +429,13 @@ function goForward() {
   }
 }
 
-function addBookmark() {
-  const url = sanitizeURL(urlInput.value);
-  if (!incognito && url && !bookmarks.includes(url)) {
-    bookmarks.push(url);
-    saveBookmarks();
-    renderBookmarks();
+function updateHistory(url) {
+  if (currentIndex < historyStack.length - 1) {
+    historyStack.splice(currentIndex + 1);
   }
-}
-
-function renderBookmarks() {
-  bookmarkList.innerHTML = '<option disabled selected>Select</option>';
-  bookmarks.forEach(url => {
-    const opt = document.createElement("option");
-    opt.value = url;
-    opt.textContent = url;
-    bookmarkList.appendChild(opt);
-  });
-}
-
-function loadBookmarks() {
-  try {
-    bookmarks = JSON.parse(localStorage.getItem(`bookmarks_${currentProfile}`)) || [];
-  } catch {
-    bookmarks = [];
-  }
-  renderBookmarks();
-}
-
-function loadBookmark(url) {
-  if (url) window.open(url, "_blank");
-}
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const current = html.getAttribute("data-theme");
-  html.setAttribute("data-theme", current === "light" ? "dark" : "light");
-}
-
-function toggleIncognito() {
-  incognito = !incognito;
-  alert(`Incognito ${incognito ? "ON" : "OFF"}`);
-}
-
-function switchProfile(profile) {
-  currentProfile = profile;
-  loadBookmarks();
-}
-
-function saveBookmarks() {
-  localStorage.setItem(`bookmarks_${currentProfile}`, JSON.stringify(bookmarks));
+  historyStack.push(url);
+  currentIndex = historyStack.length - 1;
+  saveToLocalHistory(url);
 }
 
 function saveToLocalHistory(url) {
@@ -494,12 +467,65 @@ function loadFromHistory(url) {
   closeHistory();
 }
 
+function addBookmark() {
+  const url = sanitizeURL(urlInput.value);
+  if (!incognito && url && !bookmarks.includes(url)) {
+    bookmarks.push(url);
+    saveBookmarks();
+    renderBookmarks();
+  }
+}
+
+function renderBookmarks() {
+  bookmarkList.innerHTML = '<option disabled selected>Select</option>';
+  bookmarks.forEach(url => {
+    const opt = document.createElement("option");
+    opt.value = url;
+    opt.textContent = url;
+    bookmarkList.appendChild(opt);
+  });
+}
+
+function loadBookmarks() {
+  try {
+    bookmarks = JSON.parse(localStorage.getItem(`bookmarks_${currentProfile}`)) || [];
+  } catch {
+    bookmarks = [];
+  }
+  renderBookmarks();
+}
+
+function saveBookmarks() {
+  localStorage.setItem(`bookmarks_${currentProfile}`, JSON.stringify(bookmarks));
+}
+
+function loadBookmark(url) {
+  if (url) window.open(url, "_blank");
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute("data-theme");
+  html.setAttribute("data-theme", current === "light" ? "dark" : "light");
+}
+
+function toggleIncognito() {
+  incognito = !incognito;
+  alert(`Incognito ${incognito ? "ON" : "OFF"}`);
+}
+
+function switchProfile(profile) {
+  currentProfile = profile;
+  loadBookmarks();
+}
+
 function startListening(target = "search") {
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = "en-IN";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-  recognition.onresult = function (event) {
+
+  recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     if (target === "search") {
       searchBox.value = transcript;
@@ -509,12 +535,9 @@ function startListening(target = "search") {
       navigate();
     }
   };
-  recognition.onerror = function (event) {
-    alert("Voice input error: " + event.error);
-  };
-  recognition.onspeechend = function () {
-    recognition.stop();
-  };
+
+  recognition.onerror = (event) => alert("Voice input error: " + event.error);
+  recognition.onspeechend = () => recognition.stop();
   recognition.start();
 }
 
@@ -530,14 +553,14 @@ function runSearch() {
 }
 
 function fetchWikipedia(query) {
-  const safeQuery = encodeURIComponent(query);
-  fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${safeQuery}`)
+  fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`)
     .then(res => res.json())
     .then(data => {
       if (data.type?.includes("not_found")) {
         document.getElementById("wikiContent").innerHTML = `<p>No Wikipedia article found for "${query}".</p>`;
         return;
       }
+
       const highlighted = data.extract
         .split(/(?<=\.|!|\?)\s+/)
         .map(sentence => highlightImportantWords(sentence))
@@ -629,21 +652,63 @@ function searchImages(topic) {
   const encoded = encodeURIComponent(topic);
   const container = document.getElementById("gallery");
   container.innerHTML = "";
+
   const urls = new Set();
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 60; i++) {
     urls.add(`https://tse${(i % 5) + 1}.mm.bing.net/th?q=${encoded}+bing+${i}`);
     urls.add(`https://tse${(i % 4) + 1}.mm.bing.net/th?q=${encoded}+pinterest+${i}`);
   }
-  Array.from(urls).slice(0, 20).forEach(src => {
-    const card = document.createElement("div");
-    const img = document.createElement("img");
+
+  const imageHashes = [];
+  const maxImages = 20;
+  let added = 0;
+
+  Array.from(urls).forEach((src) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = src;
-    img.alt = topic;
-    img.loading = "lazy";
-    img.onclick = () => openModal(src);
-    card.appendChild(img);
-    container.appendChild(card);
+
+    img.onload = () => {
+      try {
+        const hash = getAverageHash(img);
+        if (!isSimilarHash(hash, imageHashes) && added < maxImages) {
+          imageHashes.push(hash);
+          const clone = img.cloneNode();
+          clone.onclick = () => openModal(src);
+          container.appendChild(clone);
+          added++;
+        }
+      } catch {}
+    };
   });
+
+  function getAverageHash(image) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const size = 8;
+    canvas.width = size;
+    canvas.height = size;
+    ctx.drawImage(image, 0, 0, size, size);
+    const data = ctx.getImageData(0, 0, size, size).data;
+
+    const grayscale = [];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      grayscale.push(0.299 * r + 0.587 * g + 0.114 * b);
+    }
+
+    const avg = grayscale.reduce((sum, val) => sum + val, 0) / grayscale.length;
+    return grayscale.map(val => (val > avg ? 1 : 0)).join('');
+  }
+
+  function hammingDistance(hash1, hash2) {
+    return hash1.split('').filter((char, i) => char !== hash2[i]).length;
+  }
+
+  function isSimilarHash(newHash, existingHashes) {
+    const threshold = 5;
+    return existingHashes.some(h => hammingDistance(newHash, h) <= threshold);
+  }
 }
 
 function openModal(src) {
@@ -673,8 +738,7 @@ function zoomOut() {
 
 urlInput.addEventListener("keypress", e => { if (e.key === "Enter") navigate(); });
 searchBox.addEventListener("keypress", e => { if (e.key === "Enter") runSearch(); });
-
-
 </script>
+
 </body>
 </html>
