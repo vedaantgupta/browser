@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Browser App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --accent: #007bff;
+  --accent-hover: #0056b3;
+  --header-bg: #222;
+  --nav-bg: #333;
+  --tab-bg: #444;
+  --card-bg: #fff;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --radius: 8px;
+}
+[data-theme="dark"] {
+  --bg: #0b103a;
+  --fg: #e0e0e0;
+  --accent: #3399ff;
+  --accent-hover: #2277cc;
+  --header-bg: #1c1c1c;
+  --nav-bg: #2a2a2a;
+  --tab-bg: #3a3a3a;
+  --card-bg: #1e1e1e;
+  --shadow: 0 2px 6px rgba(255,255,255,0.05);
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+header, .tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--header-bg);
+  color: white;
+}
+
+input[type="text"], select {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: var(--radius);
+  border: none;
+  background: #f9f9f9;
+  color: var(--fg);
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--accent-hover);
+}
+
+nav {
+  background: var(--nav-bg);
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  overflow-x: auto;
+}
+
+nav button.tab {
+  background: var(--tab-bg);
+  color: white;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+}
+
+nav button.tab.active {
+  background: var(--accent);
+}
+
+iframe {
+  width: 100%;
+  height: calc(100vh - 200px);
+  border: none;
+  background: var(--card-bg);
+}
+
+#output {
+  padding: 20px;
+}
+
+.section {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.result a {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.result a:hover {
+  text-decoration: underline;
+}
+
+.result p {
+  font-size: 14px;
+  margin: 5px 0 15px;
+  color: var(--fg);
+}
+
+.cta-button {
+  background-color: #007BFF;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cta-button:hover {
+  background-color: #0056b3;
+}
+
+#progressBar {
+  height: 4px;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.3s;
+}
+
+aside#historyBox {
+  display: none;
+  background: var(--card-bg);
+  color: var(--fg);
+  padding: 20px;
+}
+
+aside#historyBox ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ✅ Smart Image Gallery - Clean & Responsive */
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#gallery div {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px; /* Ideal card height */
+  position: relative;
+}
+
+#gallery img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+#gallery img:hover {
+  transform: scale(1.05);
+}
+
+/* ✅ Image Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+}
+
+.modal img {
+  max-height: 90vh;
+  max-width: 90vw;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  border-radius: var(--radius);
+}
+
+.zoom-controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+  </style>
+</head>
+<body>
+ <header>
+    <button onclick="goBack()">⬅️</button>
+    <button onclick="goForward()">➡️</button>
+    <input type="text" id="urlInput" placeholder="Enter URL">
+    <button onclick="startListening('url')">🎤</button>
+    <button onclick="navigate()">Go</button>
+    <button onclick="addBookmark()">🔖</button>
+    <button onclick="toggleTheme()">🌓</button>
+    <button onclick="toggleIncognito()">🕵️</button>
+    <select id="profileSelect" onchange="switchProfile(this.value)">
+      <option value="default">Default</option>
+      <option value="work">Work</option>
+      <option value="personal">Personal</option>
+    </select>
+  </header>
+
+  <nav id="tabs"></nav>
+
+  <div class="tools">
+    <span>Bookmarks:</span>
+    <select id="bookmarkList" onchange="loadBookmark(this.value)">
+      <option disabled selected>Select</option>
+    </select>
+    <button onclick="addTab()">➕ Tab</button>
+    <button onclick="removeTab()">❌ Tab</button>
+    <a href="bot.html" class="cta-button" target="_blank">AssistAI</a>
+    <a href="how to use guide.html" class="cta-button" target="_blank">How to Use</a>
+    <button onclick="showHistory()">📜 <small style="color:#ccc;">history</small></button>
+  </div>
+
+  <div class="tools">
+    <input type="text" id="searchBox" placeholder="Search Topic...">
+    <button onclick="startListening('search')">🎤</button>
+    <button onclick="runSearch()">Search</button>
+    <input type="text" id="imageSearchInput" placeholder="Search topic for images..." />
+<button onclick="openImageSearch()">🔍 View Images</button>
+  </div>
+
+  <div id="progressBar"></div>
+
+  <main id="output">
+    <section id="wiki" class="section">
+
+<!-- Wikipedia Results Area -->
+<div id="wikiSection">
+  <div id="listenControls" style="display: none; margin-bottom: 10px;">
+    <select id="languageSelect">
+      <option value="en-US">English (US)</option>
+      <option value="hi-IN">English (India)</option>
+      <option value="fr-FR">English (French)</option>
+      <option value="de-DE">English (German)</option>
+    </select>
+    <button onclick="speakWikipediaSummary()">🔊 Listen</button>
+      <button onclick="pauseSpeaking()">⏸ Pause</button>
+  <button onclick="resumeSpeaking()">▶️ Resume</button>
+  <button onclick="stopSpeaking()">⏹ Stop</button>
+  </div>
+
+  <div id="wikiContent">
+    <!-- Wikipedia summary gets injected here -->
+  </div>
+</div>
+
+    </section>
+    <section id="images" class="section">
+      <h2>📸 Images</h2>
+
+<div id="gallery" class="gallery"></div>
+
+<div id="imgModal" class="modal" onclick="closeModal(event)">
+  <img id="modalImg" src="" alt="Preview">
+  <div class="zoom-controls">
+    <button onclick="zoomIn()">➕ Zoom</button>
+    <button onclick="zoomOut()">➖ Zoom</button>
+  </div>
+</div>
+    </section>
+    <section id="results" class="section"></section>
+  </main>
+
+  <iframe id="viewer" sandbox="allow-scripts allow-same-origin" src="about:blank"></iframe>
+
+  <aside id="historyBox">
+    <button onclick="closeHistory()" style="float:right; background:red; color:white; border:none;">X</button>
+    <h3>🕘 Browsing History</h3>
+    <ul id="historyList"></ul>
+  </aside>
+
+<script>
+// Final Working JS for Mini Browser App with All Features
+
+// Final Working JS for Mini Browser App with All Features
+
+// Global variables
+const viewer = document.getElementById("viewer");
+const urlInput = document.getElementById("urlInput");
+const searchBox = document.getElementById("searchBox");
+const bookmarkList = document.getElementById("bookmarkList");
+
+let tabs = [{ url: "about:blank" }];
+let activeTab = 0;
+let historyStack = [];
+let currentIndex = -1;
+let bookmarks = [];
+let incognito = false;
+let currentProfile = "default";
+let availableVoices = [];
+let currentUtterance = null;
+let currentZoom = 1;
+
+const preferredLanguages = [
+  { code: "en-US", name: "English" },
+  { code: "es-ES", name: "Spanish" },
+  { code: "hi-IN", name: "Hindi" },
+  { code: "zh-CN", name: "Chinese" },
+  { code: "fr-FR", name: "French" },
+  { code: "ar-SA", name: "Arabic" },
+  { code: "pt-BR", name: "Portuguese" },
+  { code: "ru-RU", name: "Russian" },
+  { code: "bn-IN", name: "Bengali" },
+  { code: "de-DE", name: "German" }
+];
+
+window.onload = () => {
+  loadBookmarks();
+  renderBookmarks();
+  availableVoices = speechSynthesis.getVoices();
+  populateLanguageSelect();
+  speechSynthesis.onvoiceschanged = () => {
+    availableVoices = speechSynthesis.getVoices();
+    populateLanguageSelect();
+  };
+};
+
+function sanitizeURL(input) {
+  try {
+    let url = input.trim();
+    if (!url) return "";
+    if (!url.includes(".") && !url.startsWith("http")) {
+      return `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(url)}`;
+    }
+    if (!url.startsWith("http")) {
+      url = "https://" + url;
+    }
+    return new URL(url).href;
+  } catch {
+    alert("Invalid URL");
+    return "";
+  }
+}
+
+function navigate() {
+  const url = sanitizeURL(urlInput.value);
+  if (url) {
+    window.open(url, "_blank");
+    if (!incognito) updateHistory(url);
+  }
+}
+
+function updateHistory(url) {
+  if (currentIndex < historyStack.length - 1) {
+    historyStack.splice(currentIndex + 1);
+  }
+  historyStack.push(url);
+  currentIndex = historyStack.length - 1;
+  saveToLocalHistory(url);
+}
+
+function goBack() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    window.open(historyStack[currentIndex], "_blank");
+  }
+}
+
+function goForward() {
+  if (currentIndex < historyStack.length - 1) {
+    currentIndex++;
+    window.open(historyStack[currentIndex], "_blank");
+  }
+}
+
+function addBookmark() {
+  const url = sanitizeURL(urlInput.value);
+  if (!incognito && url && !bookmarks.includes(url)) {
+    bookmarks.push(url);
+    saveBookmarks();
+    renderBookmarks();
+  }
+}
+
+function renderBookmarks() {
+  bookmarkList.innerHTML = '<option disabled selected>Select</option>';
+  bookmarks.forEach(url => {
+    const opt = document.createElement("option");
+    opt.value = url;
+    opt.textContent = url;
+    bookmarkList.appendChild(opt);
+  });
+}
+
+function loadBookmarks() {
+  try {
+    bookmarks = JSON.parse(localStorage.getItem(`bookmarks_${currentProfile}`)) || [];
+  } catch {
+    bookmarks = [];
+  }
+  renderBookmarks();
+}
+
+function loadBookmark(url) {
+  if (url) window.open(url, "_blank");
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute("data-theme");
+  html.setAttribute("data-theme", current === "light" ? "dark" : "light");
+}
+
+function toggleIncognito() {
+  incognito = !incognito;
+  alert(`Incognito ${incognito ? "ON" : "OFF"}`);
+}
+
+function switchProfile(profile) {
+  currentProfile = profile;
+  loadBookmarks();
+}
+
+function saveBookmarks() {
+  localStorage.setItem(`bookmarks_${currentProfile}`, JSON.stringify(bookmarks));
+}
+
+function saveToLocalHistory(url) {
+  const now = new Date().toLocaleString();
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  history.push({ url, time: now });
+  localStorage.setItem("history", JSON.stringify(history));
+}
+
+function showHistory() {
+  const box = document.getElementById("historyBox");
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+  const historyItems = JSON.parse(localStorage.getItem("history") || "[]");
+  historyItems.slice(-100).reverse().forEach(entry => {
+    const li = document.createElement("li");
+    li.innerHTML = `<small>${entry.time}</small><br><a href="#" onclick="loadFromHistory('${entry.url}')">${entry.url}</a><hr>`;
+    list.appendChild(li);
+  });
+  box.style.display = "block";
+}
+
+function closeHistory() {
+  document.getElementById("historyBox").style.display = "none";
+}
+
+function loadFromHistory(url) {
+  window.open(url, "_blank");
+  closeHistory();
+}
+
+function startListening(target = "search") {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript;
+    if (target === "search") {
+      searchBox.value = transcript;
+      runSearch();
+    } else {
+      urlInput.value = transcript;
+      navigate();
+    }
+  };
+  recognition.onerror = function (event) {
+    alert("Voice input error: " + event.error);
+  };
+  recognition.onspeechend = function () {
+    recognition.stop();
+  };
+  recognition.start();
+}
+
+function runSearch() {
+  const query = searchBox.value.trim();
+  if (!query) return;
+  document.getElementById("wikiContent").innerHTML = `<p>Loading summary...</p>`;
+  document.getElementById("listenControls").style.display = "none";
+  fetchWikipedia(query);
+  showEnhancedLinks(query);
+  searchImages(query);
+  if (!incognito) saveToLocalHistory(query);
+}
+
+function fetchWikipedia(query) {
+  const safeQuery = encodeURIComponent(query);
+  fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${safeQuery}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.type?.includes("not_found")) {
+        document.getElementById("wikiContent").innerHTML = `<p>No Wikipedia article found for "${query}".</p>`;
+        return;
+      }
+      const highlighted = data.extract
+        .split(/(?<=\.|!|\?)\s+/)
+        .map(sentence => highlightImportantWords(sentence))
+        .map(sentence => `<span style="background-color: #ffff99;">${sentence}</span>`)
+        .join(" ");
+
+      const imgTag = data.thumbnail ? `<a href="${data.thumbnail.source}" target="_blank"><img src="${data.thumbnail.source}" alt="${query}" style="max-width:200px;"></a>` : "";
+      document.getElementById("wikiContent").innerHTML = `
+        <h2>AI Summary</h2>
+        <p id="wikiSummaryText">${highlighted}</p>
+        ${imgTag}
+        <p><a href="${data.content_urls.desktop.page}" target="_blank">Read full article</a></p>`;
+      document.getElementById("listenControls").style.display = "block";
+    })
+    .catch(() => {
+      document.getElementById("wikiContent").innerHTML = `<p>Failed to load Wikipedia summary.</p>`;
+    });
+}
+
+function highlightImportantWords(sentence) {
+  return sentence.replace(/\b([A-Z][a-z]{2,}|\d{4}|AI|ML|NASA|UN|USA|India|World|Technology)\b/g, '<b><i>$1</i></b>');
+}
+
+function populateLanguageSelect() {
+  const select = document.getElementById("languageSelect");
+  select.innerHTML = "";
+  preferredLanguages.forEach(lang => {
+    const opt = document.createElement("option");
+    opt.value = lang.code;
+    opt.textContent = lang.name;
+    select.appendChild(opt);
+  });
+}
+
+function speakWikipediaSummary() {
+  const text = document.getElementById("wikiSummaryText")?.innerText;
+  if (!text) return alert("No summary available to read.");
+  const lang = document.getElementById("languageSelect").value;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
+  const voice = availableVoices.find(v => v.lang === lang && v.name.includes("Google")) ||
+                availableVoices.find(v => v.lang === lang) ||
+                availableVoices.find(v => v.lang.startsWith(lang.split('-')[0]));
+  if (voice) {
+    utterance.voice = voice;
+    speechSynthesis.cancel();
+    currentUtterance = utterance;
+    speechSynthesis.speak(utterance);
+  } else {
+    alert("Voice not available.");
+  }
+}
+
+function pauseSpeaking() {
+  if (speechSynthesis.speaking && !speechSynthesis.paused) speechSynthesis.pause();
+}
+
+function resumeSpeaking() {
+  if (speechSynthesis.paused) speechSynthesis.resume();
+}
+
+function stopSpeaking() {
+  speechSynthesis.cancel();
+}
+
+function showEnhancedLinks(query) {
+  const encoded = encodeURIComponent(query);
+  const links = [
+    { name: "DuckDuckGo", url: `https://lite.duckduckgo.com/lite/?q=${encoded}` },
+    { name: "Wikipedia", url: `https://en.wikipedia.org/wiki/${encoded}` },
+    { name: "GitHub", url: `https://github.com/search?q=${encoded}` },
+    { name: "YouTube", url: `https://www.youtube.com/results?search_query=${encoded}` },
+    { name: "Amazon", url: `https://www.amazon.in/s?k=${encoded}` },
+    { name: "Flipkart", url: `https://www.flipkart.com/search?q=${encoded}` },
+    { name: "Pinterest", url: `https://www.pinterest.com/search/pins/?q=${encoded}` },
+    { name: "Google Play", url: `https://play.google.com/store/search?q=${encoded}&c=apps` }
+  ];
+  document.getElementById("results").innerHTML = `
+    <h2>Relevant Links for "${query}"</h2>
+    ${links.map(link => `
+      <div class="result">
+        <a href="${link.url}" target="_blank">${link.name}</a>
+        <p>Explore "${query}" on ${link.name}.</p>
+      </div>`).join("")}`;
+}
+
+function searchImages(topic) {
+  if (!topic) return;
+  const encoded = encodeURIComponent(topic);
+  const container = document.getElementById("gallery");
+  container.innerHTML = "";
+  const urls = new Set();
+  for (let i = 0; i < 10; i++) {
+    urls.add(`https://tse${(i % 5) + 1}.mm.bing.net/th?q=${encoded}+bing+${i}`);
+    urls.add(`https://tse${(i % 4) + 1}.mm.bing.net/th?q=${encoded}+pinterest+${i}`);
+  }
+  Array.from(urls).slice(0, 20).forEach(src => {
+    const card = document.createElement("div");
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = topic;
+    img.loading = "lazy";
+    img.onclick = () => openModal(src);
+    card.appendChild(img);
+    container.appendChild(card);
+  });
+}
+
+function openModal(src) {
+  currentZoom = 1;
+  const modal = document.getElementById("imgModal");
+  const modalImg = document.getElementById("modalImg");
+  modalImg.src = src;
+  modalImg.style.transform = `scale(${currentZoom})`;
+  modal.style.display = "flex";
+}
+
+function closeModal(e) {
+  if (e.target.id === "imgModal" || e.target.tagName === "IMG") {
+    document.getElementById("imgModal").style.display = "none";
+  }
+}
+
+function zoomIn() {
+  currentZoom += 0.1;
+  document.getElementById("modalImg").style.transform = `scale(${currentZoom})`;
+}
+
+function zoomOut() {
+  currentZoom = Math.max(0.1, currentZoom - 0.1);
+  document.getElementById("modalImg").style.transform = `scale(${currentZoom})`;
+}
+
+urlInput.addEventListener("keypress", e => { if (e.key === "Enter") navigate(); });
+searchBox.addEventListener("keypress", e => { if (e.key === "Enter") runSearch(); });
+
+
+</script>
+</body>
+</html>
